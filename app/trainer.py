@@ -1,10 +1,17 @@
 import csv
 import os
+import sys
 
-langs = ['Dutch','German','Swedish','French','Spanish','Italian','Turkish']
+# langs = ['Dutch','German','Swedish','French','Spanish','Italian','Turkish']
+langs = sys.argv[1:]
+noLangs = len(langs)
+# print(langs[0])
 corpora = {}
 counts = {}
 model = {}
+
+print(langs)
+
 
 
 # Generate the absolute path to the pwd
@@ -30,7 +37,7 @@ for lang in langs:
 # Count all trigrams across the corpora and store counts for each language 
 progress = 0
 for lang in langs:
-    print("Training models...(%s/7)\n" % str(progress))
+    print("Training models...(%s/%s)\n" % (str(progress), str(noLangs)))
     for i in range( len(corpora[lang]) - 2):
         threeGram = corpora[lang][i:i+3]
         
@@ -48,8 +55,9 @@ for lang in langs:
             model[lang][gram] = counts[lang][gram] / float(len(corpora[lang]) - 2)
 
     progress += 1
-print("Training models...(%s/7)\n\n" % str(progress))
+print("Training models...(%s/%s)\n\n" % (str(progress), str(noLangs)))
 print("Done!\n\n")
+
 
 
 print("Writing model specifications...\n\n")

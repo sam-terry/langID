@@ -1,6 +1,8 @@
 import csv
+from json import encoder
 import os
 import sys
+import json
 
 # langs = ['Dutch','German','Swedish','French','Spanish','Italian','Turkish']
 langs = sys.argv[1:]
@@ -27,7 +29,7 @@ for lang in langs:
         corpora[lang] = corpFile.read()
 
     # Remove all model specifications to be replaced by this build
-    os.remove(os.path.join(currentWD, "models/mod_%s.csv" %lang))
+    # os.remove(os.path.join(currentWD, "models/mod_%s.csv" %lang))
 
     counts[lang] = {}
     model[lang] = {}
@@ -52,6 +54,7 @@ for lang in langs:
     # Calculate scores by dividing each trigram count by the total trigrams in each corpus
     for gram in counts[lang]:
         if counts[lang][gram] > 0:
+            # model[lang][gram] = str(counts[lang][gram] / float(len(corpora[lang]) - 2))
             model[lang][gram] = counts[lang][gram] / float(len(corpora[lang]) - 2)
 
     progress += 1
@@ -61,11 +64,15 @@ print("Done!\n\n")
 
 
 print("Writing model specifications...\n\n")
-for l in langs:
-    writePath = os.path.join(currentWD, "models/mod_%s.csv" %l)
-    with open(writePath, 'w') as outfile:
-        scorewriter = csv.writer(outfile)
-        for g in model[l]:
-            scorewriter.writerow([g,model[l][g]])
-    
+# for l in langs:
+#     writePath = os.path.join(currentWD, "models/mod_%s.json" %l)
+    # with open(writePath, 'w') as outfile:
+    #     scorewriter = csv.writer(outfile)
+    #     for g in model[l]:
+    #         scorewriter.writerow([g,model[l][g]])
+
+writePath = os.path.join(currentWD, "models/modeltest.json")
+# with open(writePath, "w") as outfile:
+#     json.dump(model, outfile, encoding="utf-16")
+print(model[langs[0]])
 print("Done!")

@@ -1,0 +1,5 @@
+['Spanish', 'French']
+Training models...(0/2)
+
+Training models...(1/2)
+

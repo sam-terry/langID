@@ -1,0 +1,38 @@
+TODO:
+
+- Finish implementation of TrigramTrie class
+	- Prune()
+	- UpdateScores() -- probably shouldn't even be in the class; this can be done when the models are trained.
+
+- Figure out how export TrigramTries to SQL database for storage
+	- This should be part of the training component. 
+	- For smoothing--if a trigram doesn't not exist in a language, don't go back and add it to that language's tree. Instead, just add
+		a constant smoothing value for that trigram / language pair in the database. The tries themselves should only persist long enough to store 
+		all the data in the database, after which point they can be deleted.
+
+- There needs to be a trainer program which builds the LMs for each language and stores the probability scores in a database. 
+	- The trainer program needs to iterate through the corpora in the Monolingual data directory
+	- It should, based on the file names, look up the corresponding language identifier code to label the trie for that language
+	- It also needs to be able to read trigrams out of the corpus--perhaps with a character buffer. What is the most efficient way to do this,
+		given that I/O operations can be a bottleneck for C++?
+	- Once the trie is created, it should perform DFS on the tree to extract all the stored trigrams and their scores. It is probably adequate to just store
+		counts for each trigram and then calculate the scores by taking the log of (trigramCount / totalTrigrams) for each trie when the model is being stored. 
+		Still, I should investigate smoothing algorithms for n-gram models, because I may have to accomodate the trigrams from outside the corpus in calculating each score
+	- The database should be a table like the following:
+
+	     |   AFR   |   ART   |   SQI   |   ARQ   | ...
+	--------------------------------------------------
+	'aaa'| 0.11344 | 0.48245 | 0.23475 | 0.14723 | ...
+	--------------------------------------------------
+	'abc'| 0.23475 | 0.73427 | 0.13475 | 0.31474 | ...
+	--------------------------------------------------
+	 xxx | ....... | ....... | ....... | ....... | ...
+	
+		That is, each row should represent a trigram, and each column a language, such that table[row][col] is a trigram score in a patricular language. So when the actual identifier
+		script is tabulating scores, it need only search one column at a time for the relevant trigram.
+
+
+Identifier program
+	- The application would be more efficient if it could narrow down the possible languages based on the characters in which that language is written. Thus, I think in training particular models,
+		it might be useful to not add smoothing values when the trigram in question consists of characters that language does not use. There might be a faster way to do this, but I would hate
+		to have to hardcode lists of languages which correspond to a particular character set. But I can cross this bridge when I come to it.  
